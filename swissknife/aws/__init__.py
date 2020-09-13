@@ -1,4 +1,6 @@
 import boto3
+import tqdm
+from pathlib import Path
 
 def get_instances_info(region='us-east-1'):
     ec2 = boto3.client('ec2',region)
@@ -14,3 +16,32 @@ def get_instances_info(region='us-east-1'):
             info_instances.append(instance_i)
 
     return info_instances 
+
+def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists='abort'):
+    s3_client = boto3.client('s3')
+
+    all_keys = s3_client.list_objects_v2(Bucket=bucket_name,Prefix=bucket_path)
+    keys = [k['Key'] for k in all_keys['Contents']]
+
+    download_path = Path(download_path)
+
+    if not download_path.exists():
+        download_path.mkdir(parents=True)
+
+    for key in tqdm.tqdm(keys):
+        relative_key = str(Path(key).relative_to(bucket_path))
+        destination_path = Path(download_path,relative_key)
+        download = False
+        if destination_path.exists():
+            if if_exists == 'abort':
+                print('Skipping {} as it already exists'.format(key))
+            elif if_exists == 'replace':
+                download = True
+            else:
+                raise Exception('Unknown if_exists value {}'.format(if_exists))
+        else:
+            download = True
+
+        if download:
+            print('Downloading {}'.format(key))
+            s3_client.download_file(Bucket=bucket_name,Key=key,Filename=str(destination_path))
