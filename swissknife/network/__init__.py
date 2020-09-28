@@ -20,20 +20,16 @@ def download_url(url,download_path):
 
 def download_audio_from_yt(url_id,start=None,end=None,download_path=None):
     video_page_url='https://www.youtube.com/watch?v={}'.format(url_id)
-    try:
-        #Obtengo la URL del archivo de video con mejor audio:
-        video = pafy.new(video_page_url)
-        video_duration = video.length
-        best_audio = video.getbestaudio().url
-        #Descargo la parte deseada usando ffmpeg y la guardo en un mkv sin reencodear
-        cmd = ['ffmpeg','-i',best_audio,'-vn','-ss','{}'.format(int(start)),'-to','{}'.format(int(end)),'-acodec','copy','temp_out.mkv']
-        subprocess.call(cmd,timeout=15)
-        if Path('temp_out.mkv').exists():
-            return 'temp_out.mkv'
-        else:
-            return None
-    except:
-        print("Video {} can't be downloaded".format(url_id))
+    #Obtengo la URL del archivo de video con mejor audio:
+    video = pafy.new(video_page_url)
+    video_duration = video.length
+    best_audio = video.getbestaudio().url
+    #Descargo la parte deseada usando ffmpeg y la guardo en un mkv sin reencodear
+    cmd = ['ffmpeg','-i',best_audio,'-vn','-ss','{}'.format(int(start)),'-to','{}'.format(int(end)),'-acodec','copy','temp_out.mkv']
+    subprocess.call(cmd,timeout=15)
+    if Path('temp_out.mkv').exists():
+        return 'temp_out.mkv'
+    else:
         return None
 
 def run_ssh_commands(username,hostname,pem_file,command):
