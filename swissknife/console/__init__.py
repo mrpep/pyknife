@@ -1,11 +1,11 @@
 import subprocess
 import shlex
 
-def run_command(cmd,silent=True,timeout=15):
+def run_command(cmd,silent=False,timeout=15):
     if isinstance(cmd,str):
         cmd = shlex.split(cmd)
 
     if silent:
-        subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout)
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout)
     else:
-        subprocess.call(cmd,timeout=15)
+        subprocess.check_call(cmd,timeout=15)

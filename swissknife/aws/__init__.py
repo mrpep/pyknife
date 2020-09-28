@@ -32,7 +32,7 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
         s3_client = boto3.client('s3')
 
     all_keys = s3_client.list_objects_v2(Bucket=bucket_name,Prefix=bucket_path)
-    keys = [k['Key'] for k in all_keys['Contents']]
+    keys = [k['Key'] for k in all_keys['Contents'] if k['Key'] not in exclude]
 
     download_path = Path(download_path)
 
