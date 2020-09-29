@@ -51,4 +51,5 @@ def run_ssh_commands(username,hostname,pem_file,command):
             print('Retrying connection')
 
     stdin, stdout, stderr = ssh_client.exec_command(command)
+    ssh_client.close()
     return stdin, stdout, stderr
