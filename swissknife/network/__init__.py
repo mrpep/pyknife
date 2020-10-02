@@ -53,3 +53,40 @@ def run_ssh_commands(username,hostname,pem_file,command):
     stdin, stdout, stderr = ssh_client.exec_command(command)
     ssh_client.close()
     return stdin, stdout, stderr
+
+def run_ssh_commands_2(username,hostname,pem_file,command):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    privkey = paramiko.RSAKey.from_private_key_file(pem_file)
+    if Path(command).exists():
+        with open(command,'r') as f:
+            command = f.read()
+
+    failed = True
+    while failed:
+        try:
+            ssh.connect(hostname, username=username, pkey=privkey)
+            sleeptime = 0.1
+            outdata, errdata = '', ''
+            ssh_transp = ssh.get_transport()
+            chan = ssh_transp.open_session()
+            chan.setblocking(0)
+            chan.exec_command(command)
+            while True:  # monitoring process
+                # Reading from output streams
+                while chan.recv_ready():
+                    outdata += chan.recv(1000).decode('utf-8')
+                while chan.recv_stderr_ready():
+                    errdata += chan.recv_stderr(1000).decode('utf-8')
+                if chan.exit_status_ready():  # If completed
+                    break
+                time.sleep(sleeptime)
+            retcode = chan.recv_exit_status()
+            ssh_transp.close()
+            failed = False
+        except:
+            failed = True
+            time.sleep(1)
+            print('Retrying connection')
+    
+    return outdata, errdata
