@@ -35,7 +35,7 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
         exclude = []
 
     all_keys = s3_client.list_objects_v2(Bucket=bucket_name,Prefix=bucket_path)
-    keys = [k['Key'] for k in all_keys['Contents'] if k['Key'] not in exclude]
+    keys = [k['Key'] for k in all_keys['Contents'] if k['Key'] not in exclude and k['Key'][-1] != '/']
 
     download_path = Path(download_path)
 
