@@ -31,6 +31,9 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
     else:
         s3_client = boto3.client('s3')
 
+    if exclude is None:
+        exclude = []
+
     all_keys = s3_client.list_objects_v2(Bucket=bucket_name,Prefix=bucket_path)
     keys = [k['Key'] for k in all_keys['Contents'] if k['Key'] not in exclude]
 
@@ -52,6 +55,8 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
                 raise Exception('Unknown if_exists value {}'.format(if_exists))
         else:
             download = True
+            if not destination_path.parent.exists():
+                destination_path.parent.mkdir(parents=True)
 
         if download:
             print('Downloading {}'.format(key))
