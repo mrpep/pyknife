@@ -53,8 +53,8 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
 
     download_path = Path(download_path)
 
-    if not download_path.exists():
-        download_path.mkdir(parents=True)
+    if not download_path.parent.exists():
+        download_path.parent.mkdir(parents=True)
 
     for key in tqdm.tqdm(keys):
         relative_key = str(Path(key).relative_to(bucket_path))
