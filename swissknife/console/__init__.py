@@ -8,4 +8,4 @@ def run_command(cmd,silent=False,timeout=15):
     if silent:
         subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=timeout)
     else:
-        subprocess.check_call(cmd,timeout=15)
+        subprocess.check_call(cmd,timeout=timeout)
