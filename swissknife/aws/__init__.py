@@ -1,6 +1,7 @@
 import boto3
 import tqdm
 from pathlib import Path
+from IPython import embed
 
 def get_instances_info(region='us-east-1',input_credentials=False):
     if input_credentials:       
@@ -75,3 +76,40 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
         if download:
             print('Downloading {}'.format(key))
             s3_client.download_file(Bucket=bucket_name,Key=key,Filename=str(destination_path))
+
+class S3File:
+    def __init__(self,*args):
+        self.path = '/'.join(args)
+        if not self.path.startswith('s3://'):
+            self.path = 's3://' + self.path
+        self.s3_client = boto3.client('s3')
+
+    def download(self,download_path):
+        if not download_path.parent.exists():
+            download_path.parent.mkdir(parents=True)
+        self.s3_client.download_file(Bucket=self.get_bucket_name(),Key=self.get_key(),Filename=str(download_path))
+    
+    def upload(self,source_path):
+        self.s3_client.upload_file(str(source_path),self.get_bucket_name(),self.get_key())
+
+    def exists(self):
+        bucket_name = self.get_bucket_name()
+        all_keys = ['s3://{}/{}'.format(bucket_name,k['Key']) for k in get_all_s3_objects(self.s3_client, Bucket=bucket_name)]
+
+        return self.path in all_keys
+
+    def get_bucket_name(self):
+        return self.path.split('s3://')[-1].split('/')[0]
+
+    def get_key(self):
+        return '/'.join(self.path.split('s3://')[-1].split('/')[1:])
+
+    def glob(self,pattern):
+        from pathlib import PurePath
+        bucket_name = self.get_bucket_name()
+
+        all_keys = ['s3://{}/{}'.format(bucket_name,k['Key']) for k in get_all_s3_objects(self.s3_client, Bucket=bucket_name)]
+        match_keys = [k for k in all_keys if PurePath(k).match(pattern)]
+
+        return match_keys
+
