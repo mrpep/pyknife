@@ -127,3 +127,6 @@ class S3File:
 
         return match_keys
 
+    def delete(self):
+        self.s3_client.delete_object(Bucket=self.get_bucket_name(), Key=self.get_key())
+
