@@ -79,10 +79,24 @@ def download_s3(bucket_name, bucket_path, download_path, exclude=None, if_exists
 
 class S3File:
     def __init__(self,*args):
+        args = list(args)
+        for i, arg in enumerate(args):
+            if isinstance(arg,str):
+                args[i] = arg
+            elif isinstance(arg,Path):
+                arg_parts = list(arg.parts)
+                if arg.parts[0].startswith('s3:'):
+                    arg_parts[0] = 's3:/'
+                    args[i] = '/'.join(arg_parts)
+                else:
+                    args[i] = 's3://' + str(arg)
         self.path = '/'.join(args)
         if not self.path.startswith('s3://'):
             self.path = 's3://' + self.path
         self.s3_client = boto3.client('s3')
+
+    def __repr__(self):
+        return self.path
 
     def download(self,download_path):
         if not download_path.parent.exists():
