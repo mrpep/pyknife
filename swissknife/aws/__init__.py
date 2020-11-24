@@ -138,3 +138,14 @@ class S3File:
     def delete(self):
         self.s3_client.delete_object(Bucket=self.get_bucket_name(), Key=self.get_key())
 
+    def __getstate__(self):
+        d = self.__dict__
+        if 's3_client' in d:
+            d.pop('s3_client')
+        return d
+
+    def __setstate__(self,d):
+        d['s3_client'] = boto3.client('s3')
+        self.__dict__ = d
+        
+
