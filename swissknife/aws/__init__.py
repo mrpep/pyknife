@@ -82,7 +82,15 @@ class S3File:
         args = list(args)
         for i, arg in enumerate(args):
             if isinstance(arg,str):
-                args[i] = arg
+                if i == 0 and arg.startswith('s3:'):
+                    if arg.startswith('s3://'):
+                        args[i] = arg
+                    elif arg.startswith('s3:/'):
+                        args[i] = 's3://' + '/'.join(arg.split('s3:/')[1:])
+                    elif arg.startswith('s3:'):
+                        args[i] = 's3://' + '/'.join(arg.split('s3:')[1:])
+                else:
+                    args[i] = arg
             elif isinstance(arg,Path):
                 arg_parts = list(arg.parts)
                 if arg.parts[0].startswith('s3:'):
