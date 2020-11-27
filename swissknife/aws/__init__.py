@@ -81,6 +81,9 @@ class S3File:
     def __init__(self,*args):
         args = list(args)
         for i, arg in enumerate(args):
+            if isinstance(arg,S3File):
+                arg = str(arg)
+
             if isinstance(arg,str):
                 if i == 0 and arg.startswith('s3:'):
                     if arg.startswith('s3://'):
@@ -98,6 +101,7 @@ class S3File:
                     args[i] = '/'.join(arg_parts)
                 else:
                     args[i] = 's3://' + str(arg)
+
         self.path = '/'.join(args)
         if not self.path.startswith('s3://'):
             self.path = 's3://' + self.path
