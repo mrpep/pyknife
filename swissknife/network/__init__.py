@@ -5,6 +5,7 @@ import subprocess
 import paramiko
 import time
 import boto3
+import copy
 
 def download_url(url,download_path):
     r = requests.get(url, stream = True)
@@ -54,7 +55,13 @@ def run_ssh_commands(username,hostname,pem_file,command):
     ssh_client.close()
     return stdin, stdout, stderr
 
-def run_ssh_commands_2(username,hostname,pem_file,command):
+def run_ssh_commands_2(username,hostname,command,pem_file=None,ec2_instance_connect_data=None):
+    if ec2_instance_connect_data:
+        ec2_instance_connect_data = copy.deepcopy(ec2_instance_connect_data)
+        client = boto3.client('ec2-instance-connect',ec2_instance_connect_data['region'])
+        ec2_instance_connect_data.pop('region')
+        client.send_ssh_public_key(**ec2_instance_connect_data)
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     privkey = paramiko.RSAKey.from_private_key_file(pem_file)
