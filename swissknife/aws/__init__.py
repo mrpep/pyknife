@@ -20,6 +20,8 @@ def get_instances_info(region='us-east-1',input_credentials=False):
                 'name': [tag['Value'] for tag in instance['Tags'] if tag['Key']=='Name'][0], 
                 'PublicDnsName': instance['PublicDnsName']
                 } 
+            if 'PrivateIpAddress' in instance:
+                instance_i['PrivateIpAddress'] = instance['PrivateIpAddress']
             info_instances.append(instance_i)
 
     return info_instances 
@@ -111,6 +113,9 @@ class S3File:
         return self.path
 
     def download(self,download_path):
+        if isinstance(download_path,str):
+            download_path = Path(download_path)
+        download_path = download_path.expanduser()
         if not download_path.parent.exists():
             download_path.parent.mkdir(parents=True)
         self.s3_client.download_file(Bucket=self.get_bucket_name(),Key=self.get_key(),Filename=str(download_path))
