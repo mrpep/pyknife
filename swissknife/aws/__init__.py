@@ -24,7 +24,7 @@ def get_instances_info(region='us-east-1',input_credentials=False):
                 instance_i['PrivateIpAddress'] = instance['PrivateIpAddress']
             info_instances.append(instance_i)
 
-    return info_instances 
+    return info_instances
 
 def get_all_s3_objects(s3, **base_kwargs):
     #https://stackoverflow.com/questions/54314563/how-to-get-more-than-1000-objects-from-s3-by-using-list-objects-v2/54314628
