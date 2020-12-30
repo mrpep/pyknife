@@ -5,6 +5,13 @@ class CompressedFile:
     def __init__(self,path):
         self.file = Path(path).expanduser()
         self.extension = self.file.suffix
+
+    def add_file(self,filename,filename_inside):
+        if self.extension == '.zip':
+            zip_file = zipfile.ZipFile(self.file(),'w')
+            zip_file.write(filename,arcname=filename_inside)
+            zip_file.close()
+
     def extract(self,destination_path):
         destination_path = Path(destination_path).expanduser()
         if not destination_path.exists():
