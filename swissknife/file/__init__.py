@@ -31,5 +31,4 @@ class CompressedFile:
             for member in tqdm.tqdm(zip_members):
                 if not Path(destination_path,member).exists():
                     zip_file.extract(member,destination_path)
-                    print('extracting {} in {}'.format(member,destination_path))
             zip_file.close()
