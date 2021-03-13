@@ -125,9 +125,14 @@ class S3File:
 
     def exists(self):
         bucket_name = self.get_bucket_name()
-        all_keys = ['s3://{}/{}'.format(bucket_name,k['Key']) for k in get_all_s3_objects(self.s3_client, Bucket=bucket_name)]
+        key = self.path.split('s3://{}/'.format(bucket_name))[-1]
 
-        return self.path in all_keys
+        results = self.s3_client.list_objects_v2(Bucket=bucket_name,Prefix=key)
+        
+        #all_keys = ['s3://{}/{}'.format(bucket_name,k['Key']) for k in get_all_s3_objects(self.s3_client, Bucket=bucket_name)]
+
+        #return self.path in all_keys
+        return results['KeyCount']>0
 
     def get_bucket_name(self):
         return self.path.split('s3://')[-1].split('/')[0]
