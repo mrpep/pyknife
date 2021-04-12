@@ -49,6 +49,11 @@ setup(
 
     packages=find_packages(),  # Required
 
+    install_requires=['boto3',
+                      'tqdm',
+                      'pafy',
+                      'paramiko'],
+
     project_urls={  # Optional
     },
 )
