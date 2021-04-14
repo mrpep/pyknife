@@ -52,7 +52,9 @@ setup(
     install_requires=['boto3',
                       'tqdm',
                       'pafy',
-                      'paramiko'],
+                      'paramiko',
+                      'scipy',
+                      'numpy'],
 
     project_urls={  # Optional
     },

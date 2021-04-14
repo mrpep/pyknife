@@ -40,6 +40,18 @@ def get_default_window(n_fft):
     return window, gamma, lambdasqr
 
 def pghi(x, win_length=2048, hop_length=512, n_fft=None, window=None, synthesis_window=None,gamma=None,lambdasqr=None, tol=1e-6):
+    """
+    Performs phase gradient heap integration to estimate the phase of a spectrogram given the magnitude
+    x:           magnitude spectrogram
+    win_length:  size (in samples) of the analysis window
+    hop_length:  number of samples between two consecutive windows
+    n_fft:       (default = win_length), number of samples to calculate the FFT. If it is larger than win_length, window will get padded
+    window:      (default is a gaussian window, it is recommended to use it). Array of size win_length.
+    synthesis_window: window to use for the synthesis step. By default it will be calculated from window
+    gamma:       constant related to the window (if not given, is calculated from lambdasqr)
+    lambdasqr:   constant related to the window (if not given, the default value corresponds to the gaussian window)
+    tol:         small signal relative magnitude filtering size
+    """
     if n_fft is None: n_fft = win_length
     if gamma is not None: lambdasqr = gamma/(2*np.pi)
     if window is None:
@@ -97,12 +109,27 @@ def pghi(x, win_length=2048, hop_length=512, n_fft=None, window=None, synthesis_
     return phase
 
 def stft(x,win_length=2048,hop_length=512,window=None):
+    """
+    Performs the short fourier transform of x in a way that is compatible with PGHI
+    x:           time domain signal
+    win_length:  size (in samples) of the analysis window
+    hop_length:  number of samples between two consecutive windows
+    window:      array of size win_length with the window to apply
+    """
     L = x.shape[0] - win_length
     if window is None:
         window, _, _ = get_default_window(win_length)
     return np.stack([np.fft.rfft(window*x[ix:ix + win_length]) for ix in range(0, L, hop_length)])
 
 def istft(X, win_length=2048,hop_length=512,window=None,synthesis_window=None):
+    """
+    Returns a spectrogram to the time domain by using the Overlap and Add method
+    X:                spectrogram
+    win_length:       size (in samples) of the analysis window
+    hop_length:       number of samples between two consecutive windows
+    window:           array of size win_length with the window to apply
+    synthesis_window: window to use for the synthesis step. By default it will be calculated from window
+    """
     N = X.shape[0]
     vr=np.fft.irfft(X)
     sig = np.zeros((N*hop_length+win_length))
@@ -119,6 +146,15 @@ def istft(X, win_length=2048,hop_length=512,window=None,synthesis_window=None):
     return sig
 
 def griffin_lim(X, win_length=2048,hop_length=512,window=None,synthesis_window=None, n_iters=100):
+    """
+    An implementation of the Griffin Lim algorithm
+    X:                spectrogram (can be complex and have an initial phase)
+    win_length:       size (in samples) of the analysis window
+    hop_length:       number of samples between two consecutive windows
+    window:           array of size win_length with the window to apply
+    synthesis_window: window to use for the synthesis step. By default it will be calculated from window
+    n_iters:          number of iterations to perform
+    """
     if window is None:
         window, _, _ = get_default_window(win_length)
     if synthesis_window is None:

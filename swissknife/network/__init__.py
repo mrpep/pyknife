@@ -8,6 +8,11 @@ import boto3
 import copy
 
 def download_url(url,download_path):
+    """
+    Download an url
+    url:           url to download
+    download_path: path where to save the downloaded url
+    """
     r = requests.get(url, stream = True)
     if not Path(download_path).exists():
         print("Downloading file {}".format(url)) 
@@ -20,6 +25,13 @@ def download_url(url,download_path):
         return 0
 
 def download_audio_from_yt(url_id,start=None,end=None,download_path=None):
+    """
+    Download the audio from a youtube video
+    url_id:         url of the video to download
+    start:          start (in seconds) of the video fragment to download
+    end:            end (in seconds) of the video fragment to download
+    download_path:  path where to save the downloaded audio
+    """
     video_page_url='https://www.youtube.com/watch?v={}'.format(url_id)
     #Obtengo la URL del archivo de video con mejor audio:
     video = pafy.new(video_page_url)
