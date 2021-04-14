@@ -24,11 +24,11 @@ from os import path
 # Fields marked as "Optional" may be commented out.
 
 setup(
-    name='swissknife',  # Required
+    name='pyknife',  # Required
 
     version='0.1',  # Required
 
-    description='swissknife',  # Required
+    description='pyknife',  # Required
 
     # long_description=long_description,  # Optional
 

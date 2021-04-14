@@ -1,4 +1,4 @@
-from swissknife.console import run_command
+from pyknife.console import run_command
 
 def ffmpeg_to_wav(in_file,out_file,sr=None):
     """
